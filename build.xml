@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="GeniusCore" default="all" basedir=".">
+
+	<target name="agentjar">
+		<delete file="target/Agents.jar" />
+		<jar destfile="target/Agents.jar">
+			<fileset dir="bin" includes="**/*.class" />
+			<zipgroupfileset dir="dep" includes="*.jar" excludes="GeniusCore.jar" />
+		</jar>
+	</target>
+
+	<target name="agentrepo">
+		<delete file="target/AgentRepo.jar" />
+		<jar destfile="target/AgentRepo.jar">
+			<fileset dir="repositories" includes="agents/*" />
+		</jar>
+	</target>
+
+	<target name="partyrepo">
+		<delete file="target/PartyRepo.jar" />
+		<jar destfile="target/PartyRepo.jar">
+			<fileset dir="repositories" includes="parties/*" />
+		</jar>
+	</target>
+
+
+	<target name="boarepo">
+		<delete file="target/BoaRepo.jar" />
+		<jar destfile="target/BoaRepo.jar">
+			<fileset dir="repositories" includes="boa/*" />
+		</jar>
+	</target>
+	
+	<target name="all" depends="agentjar,agentrepo, partyrepo, boarepo">
+	</target>
+
+
+</project>
