@@ -16,14 +16,14 @@
             <agentRepItem description="ANAC 2011 - BRAMAgent" classPath="agents.anac.y2011.BramAgent.BRAMAgent" agentName="ANAC 2011 - BRAMAgent"/>
             <agentRepItem description="ANAC 2011 - HardHeaded" classPath="agents.anac.y2011.HardHeaded.KLH" agentName="ANAC 2011 - HardHeaded"/>
             <agentRepItem description="ANAC 2011 - Nice Tit for Tat" classPath="agents.anac.y2011.Nice_Tit_for_Tat.NiceTitForTat" agentName="ANAC 2011 - Nice Tit fo Tat"/>
-            <!-- <agentRepItem description="ANAC 2011 - IAMhaggler2011" classPath="agents.anac.y2011.IAMhaggler2011.IAMhaggler2011" agentName="ANAC 2011 - IAMhaggler2011"/> -->
+        <!-- <agentRepItem description="ANAC 2011 - IAMhaggler2011" classPath="agents.anac.y2011.IAMhaggler2011.IAMhaggler2011" agentName="ANAC 2011 - IAMhaggler2011"/> -->
             <agentRepItem description="ANAC 2011 - AgentK2" classPath="agents.anac.y2011.AgentK2.Agent_K2" agentName="ANAC 2011 - AgentK2 (compatible with non-linear utility spaces)"/>
             <agentRepItem description="ANAC 2012 - AgentLG" classPath="agents.anac.y2012.AgentLG.AgentLG" agentName="ANAC 2012 - AgentLG"/>
             <agentRepItem description="ANAC 2012 - AgentMR" classPath="agents.anac.y2012.AgentMR.AgentMR" agentName="ANAC 2012 - AgentMR"/>
             <agentRepItem description="ANAC 2012 - The Negotiator Reloaded" classPath="agents.anac.y2012.TheNegotiatorReloaded.TheNegotiatorReloaded" agentName="ANAC 2012 - The Negotiator Reloaded"/>
             <agentRepItem description="ANAC 2012 - BRAMAgent2" classPath="agents.anac.y2012.BRAMAgent2.BRAMAgent2" agentName="ANAC 2012 - BRAMAgent2"/>
             <agentRepItem description="ANAC 2012 - CUHKAgent" classPath="agents.anac.y2012.CUHKAgent.CUHKAgent" agentName="ANAC 2012 - CUHKAgent"/>
-            <agentRepItem description="ANAC 2012 - IAMhaggler2012" classPath="agents.anac.y2012.IAMhaggler2012.IAMhaggler2012" agentName="ANAC 2012 - IAMhaggler2012"/>
+        <!--     <agentRepItem description="ANAC 2012 - IAMhaggler2012" classPath="agents.anac.y2012.IAMhaggler2012.IAMhaggler2012" agentName="ANAC 2012 - IAMhaggler2012"/> -->
             <agentRepItem description="ANAC 2012 - MetaAgent" classPath="agents.anac.y2012.MetaAgent.MetaAgent" agentName="ANAC 2012 - MetaAgent"/>
             <agentRepItem description="ANAC 2012 - OMACAgent" classPath="agents.anac.y2012.OMACagent.OMACagent" agentName="ANAC 2012 - OMACAgent"/>
             <agentRepItem description="ANAC 2013 - InoxAgent" classPath="agents.anac.y2013.InoxAgent.InoxAgent" agentName="ANAC 2013 - InoxAgent"/>
@@ -66,7 +66,11 @@
             <agentRepItem description="Implementation of FunctionalAcceptor." classPath="agents.FunctionalAcceptor" agentName="FunctionalAcceptor"/>
             <agentRepItem description="" classPath="agents.BayesianAgent" agentName="BayesianAgent"/>
             <agentRepItem description="" classPath="agents.ABMPAgent2" agentName="ABMPAgent2"/>
-            <agentRepItem description="Simplistic Tit for Tat Agent" classPath="agents.SimpleTitForTatPN" agentName="SimpleTitForTatPN"/>
+            <agentRepItem description="Simplistic Tit for Tat Agent" classPath="agents.SimpleTitForTatPN" agentName="SimpleTitForTatPN"/> 
+            <agentRepItem description="Simple strictly monotonic agent" classPath="timeIndependantAgents.StrictlyMonotonicAgent" agentName="StrictlyMonotonicAgent"/> 
+            <agentRepItem description="Simple monotonic agent" classPath="timeIndependantAgents.MonotonicAgent" agentName="MonotonicAgent"/> 
+            <agentRepItem description="least coast issue concession agent" classPath="timeIndependantAgents.LeastCostIssueAgent" agentName="LeastCostIssueAgent"/>
+            <agentRepItem description="Lexicographic concession agent" classPath="timeIndependantAgents.LexicographicAgent" agentName="LexicographicAgent"/>  
         </agentRepItems>
         <partyRepItems/>
         <domainRepItem/>

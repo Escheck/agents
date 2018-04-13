@@ -1,5 +1,8 @@
 package timeIndependantAgents;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +28,7 @@ import negotiator.issue.Value;
 import negotiator.issue.ValueInteger;
 import negotiator.issue.ValueReal;
 import negotiator.timeline.Timeline;
+import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.UtilitySpace;
 
 /**
@@ -40,14 +44,20 @@ public class LeastCostIssueAgent extends Agent {
 	private TreeMap<Double, List<Bid>> listOfAllBids;  // TreeMap die als Key die Utility der bids hat und als Value eine Liste mit allen Bids die genau die utility haben
 	private HashMap.Entry<Double, List<Bid>> oneEntry;  // Ein Eintrag der TreeMap der die Utility und alle Bids enthält die dies Utility haben
 	private UtilitySpace utilitySpace2;  //nutzen um immer get max utility aufzurufen und dann den eintrag zu löschen. sodass das beste nächste angebot immer in maxUtility steht
-
+	private AdditiveUtilitySpace castedAdditiveUtilitySpace;	
+	private List<Bid> sentOffers;
+	private List<Bid> allBidsList;
 
 	/**
 	 * Note: {@link SimpleAgent} does not account for the discount factor in its
 	 * computations
 	 */
 	private static double MINIMUM_BID_UTILITY = 0.0;
-
+	//Delimiter used in CSV file
+    private static final String COMMA_DELIMITER = ",";
+    private static final String NEW_LINE_SEPARATOR = "\n";
+    //CSV file header
+	private String FILE_HEADER = "Agent,";
 	/**
 	 * init is called when a next session starts with the same opponent.
 	 */
@@ -59,7 +69,12 @@ public class LeastCostIssueAgent extends Agent {
 			lastPartnerBid = null;
 			utilitySpace2 = utilitySpace.copy();
 			listOfAllBids = new TreeMap<Double, List<Bid>>();
+			sentOffers = new ArrayList<Bid>();
+			allBidsList = new ArrayList<Bid>();
+			castedAdditiveUtilitySpace = (AdditiveUtilitySpace) utilitySpace;
 			getAllBids();
+			getAllBidsList();
+			printAllBids(allBidsList, "AllBids_"+getAgentID()+getName());
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -96,6 +111,7 @@ public class LeastCostIssueAgent extends Agent {
 				action = new Offer(getAgentID(), actualBid);
 				lastBid = actualBid;
 				listOfAllBids.get(getUtil(actualBid)).remove(actualBid);
+				sentOffers.add(actualBid);
 			}else if (actionOfPartner instanceof Offer) {
 				double lastBidUtil = getUtil(lastBid);
 				boolean foundBid = false;
@@ -135,15 +151,13 @@ public class LeastCostIssueAgent extends Agent {
 					action = new Accept(getAgentID(), lastBid);
 				}else{
 					lastBid = actualBid;
-				
-						System.out.println(getAgentID() +": " + actualBid.toString() + " Util: " + getUtil(actualBid));
-				
+					sentOffers.add(actualBid);
 					action = new Offer(getAgentID(), actualBid);
 				}
 			}else if (actionOfPartner instanceof Reject){
 				//What should happen here?
 			}
-
+		this.printAllBids(sentOffers, getAgentID().toString()+getName());	
 		} catch (Exception e) {
 			System.out.println("Exception in ChooseAction:" + e.getMessage());
 			if (lastPartnerBid != null) {
@@ -193,15 +207,40 @@ public class LeastCostIssueAgent extends Agent {
 			return false;
 		}
 	}
-
-	private void printAllBids(){
-		for(Entry<Double, List<Bid>> entry : listOfAllBids.entrySet()) {
-			for(Bid b: entry.getValue()){
-				System.out.println(getAgentID() + " Bid: " +b.toString() + " util: " + entry.getKey());		
+	
+	private void printAllBids(List<Bid> bids, String filename) throws FileNotFoundException, UnsupportedEncodingException{
+//		for(Entry<Double, List<Bid>> entry : listOfAllBids.entrySet()) {
+//			for(Bid b: entry.getValue()){
+//				System.out.println(getAgentID() + " Bid: " +b.toString() + " util: " + entry.getKey());		
+//			}
+//		}
+		PrintWriter writer = new PrintWriter("C:\\Users\\Matthes\\Downloads\\" + filename + ".csv", "UTF-8");
+		FILE_HEADER = "Agent,";
+		
+		for (Issue issue: utilitySpace.getDomain().getIssues()){
+			double weight = castedAdditiveUtilitySpace.getWeight(issue.getNumber());
+			FILE_HEADER = FILE_HEADER + issue +"(Weight: " + weight + " )"+ COMMA_DELIMITER + issue+"-Utility"+ COMMA_DELIMITER;
+		}
+		FILE_HEADER = FILE_HEADER + "Utility";
+		writer.println(FILE_HEADER);
+		
+		for(Bid tempBid: bids){
+			String line = getAgentID() + COMMA_DELIMITER;
+			for (Entry<Integer, Value> entry: tempBid.getValues().entrySet()){
+				line = line + entry.getValue() + COMMA_DELIMITER + castedAdditiveUtilitySpace.getEvaluation(entry.getKey(), tempBid)  + COMMA_DELIMITER ;
 			}
-		}	
+			writer.println(line + utilitySpace.getUtility(tempBid));
+		}
+		writer.flush();
+		writer.close();
 	}	
 
+	private void getAllBidsList(){
+		BidIterator iterator = new BidIterator(utilitySpace.getDomain());
+		while(iterator.hasNext()){
+		allBidsList.add(iterator.next());
+		}
+	}
 }
 
 

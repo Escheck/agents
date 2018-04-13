@@ -1,5 +1,9 @@
 package timeIndependantAgents;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -23,6 +27,7 @@ import negotiator.issue.Value;
 import negotiator.issue.ValueInteger;
 import negotiator.issue.ValueReal;
 import negotiator.timeline.Timeline;
+import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.UtilitySpace;
 
 /**
@@ -36,14 +41,19 @@ public class StrictlyMonotonicAgent extends Agent {
 	private TreeMap<Double, Bid> listOfAllBids;
 	private Bid lastBid;
 	private UtilitySpace privUt;
-	
+	private AdditiveUtilitySpace castedAdditiveUtilitySpace;
+	private List<Bid> sentOffers;
+	private List<Bid> allBidsList;
 
 	/**
 	 * Note: {@link SimpleAgent} does not account for the discount factor in its
 	 * computations
 	 */
 	private static double MINIMUM_BID_UTILITY = 0.0;
-
+	private static final String COMMA_DELIMITER = ",";
+    private static final String NEW_LINE_SEPARATOR = "\n";
+    //CSV file header
+	private String FILE_HEADER = "Agent,";
 	/**
 	 * init is called when a next session starts with the same opponent.
 	 */
@@ -52,8 +62,12 @@ public class StrictlyMonotonicAgent extends Agent {
 		try {
 			lastBid = null;
 			listOfAllBids = new TreeMap<Double, Bid>();
+			sentOffers = new ArrayList<Bid>();
+			allBidsList = new ArrayList<Bid>();
+			castedAdditiveUtilitySpace = (AdditiveUtilitySpace) utilitySpace;
 			getAllBids();
-			//printAllBids();
+			getAllBidsList();
+			printAllBids(allBidsList, "AllBids_"+getAgentID()+getName());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -87,6 +101,7 @@ public class StrictlyMonotonicAgent extends Agent {
 				// First round. place our best bid.
 				lastBid = utilitySpace.getMaxUtilityBid();
 				action = new Offer(getAgentID(), lastBid);
+				sentOffers.add(lastBid);
 			}
 
 			if (actionOfPartner instanceof Offer || actionOfPartner instanceof Reject) {
@@ -101,9 +116,10 @@ public class StrictlyMonotonicAgent extends Agent {
 					action = new Accept(getAgentID(), lastBid);
 				}else{
 					action = new Offer(getAgentID(), lastBid);
+					sentOffers.add(lastBid);
 				}
 			}
-
+		this.printAllBids(sentOffers, getAgentID().toString()+getName());	
 		} catch (Exception e) {
 			System.out.println("Exception in ChooseAction:" + e.getMessage());
 			if (lastPartnerBid != null) {
@@ -119,17 +135,13 @@ public class StrictlyMonotonicAgent extends Agent {
 		BidIterator iterator = new BidIterator(utilitySpace.getDomain());
 		while (iterator.hasNext()) {
 			Bid tempBid = iterator.next();
-
-			//System.out.println(getAgentID() + " " +tempBid + " util: " + getUtil(tempBid));
-
+			
 			listOfAllBids.put(getUtil(tempBid), tempBid);
 		}	
 	}
 
 	private Double getUtil(Bid bid) throws Exception {
-		// round util to 3 decimals, to limit our space.
-		return Math.round(1000. * utilitySpace.getUtility(bid)) / 1000.;
-		
+		return utilitySpace.getUtility(bid);
 	}
 
 	private boolean checkAcceptance(Bid bid) throws Exception{
@@ -148,11 +160,39 @@ public class StrictlyMonotonicAgent extends Agent {
 		}
 	}
 
-	private void printAllBids(){
-		for(Entry<Double, Bid> entry : listOfAllBids.entrySet()) {
-			System.out.println(getAgentID() + " " +entry.getValue() + " util: " + entry.getKey());	
-		}	
+	private void printAllBids(List<Bid> bids, String filename) throws FileNotFoundException, UnsupportedEncodingException{
+//		for(Entry<Double, List<Bid>> entry : listOfAllBids.entrySet()) {
+//			for(Bid b: entry.getValue()){
+//				System.out.println(getAgentID() + " Bid: " +b.toString() + " util: " + entry.getKey());		
+//			}
+//		}
+		PrintWriter writer = new PrintWriter("C:\\Users\\Matthes\\Downloads\\" + filename + ".csv", "UTF-8");
+		FILE_HEADER = "Agent,";
+		
+		for (Issue issue: utilitySpace.getDomain().getIssues()){
+			double weight = castedAdditiveUtilitySpace.getWeight(issue.getNumber());
+			FILE_HEADER = FILE_HEADER + issue +"(Weight: " + weight + " )"+ COMMA_DELIMITER + issue+"-Utility"+ COMMA_DELIMITER;
+		}
+		FILE_HEADER = FILE_HEADER + "Utility";
+		writer.println(FILE_HEADER);
+		
+		for(Bid tempBid: bids){
+			String line = getAgentID() + COMMA_DELIMITER;
+			for (Entry<Integer, Value> entry: tempBid.getValues().entrySet()){
+				line = line + entry.getValue() + COMMA_DELIMITER + castedAdditiveUtilitySpace.getEvaluation(entry.getKey(), tempBid)  + COMMA_DELIMITER ;
+			}
+			writer.println(line + utilitySpace.getUtility(tempBid));
+		}
+		writer.flush();
+		writer.close();
 	}	
+
+	private void getAllBidsList(){
+		BidIterator iterator = new BidIterator(utilitySpace.getDomain());
+		while(iterator.hasNext()){
+		allBidsList.add(iterator.next());
+		}
+	}
 
 }
 
