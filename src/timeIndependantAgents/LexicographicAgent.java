@@ -60,7 +60,7 @@ public class LexicographicAgent extends Agent {
 	private Integer ArrayPositionNextOffer;
 	//Delimiter used in CSV file
 	private static final String COMMA_DELIMITER = ",";
-
+	private double middlePointUtility;
 	//CSV file header
 	private String FILE_HEADER = "Agent,";
 	/**
@@ -103,6 +103,7 @@ public class LexicographicAgent extends Agent {
 		actionOfPartner = opponentAction;
 		if (actionOfPartner instanceof Offer) {
 			lastPartnerBid = ((Offer) actionOfPartner).getBid();
+			this.calculateFairDistribution();		
 		}
 	}
 
@@ -113,7 +114,7 @@ public class LexicographicAgent extends Agent {
 		try {
 			if (lastBid == null){
 				// First round. place our best bid.
-				actualBid = listOfAllBids.get(ArrayPositionNextOffer);
+				actualBid = listOfAllBids.get(0);
 				ArrayPositionNextOffer++;
 				action = new Offer(getAgentID(), actualBid);
 				lastBid = actualBid;
@@ -136,8 +137,8 @@ public class LexicographicAgent extends Agent {
 					//Check if Opponent offer is acceptable
 				}else if(checkAcceptance(lastPartnerBid)){
 					action = new Accept(getAgentID(), lastBid);
-
 				}else{
+					
 					lastBid = actualBid;				
 					sentOffers.add(actualBid);
 					action = new Offer(getAgentID(), actualBid);
@@ -228,7 +229,7 @@ public class LexicographicAgent extends Agent {
 	}
 
 	private boolean checkReject(Bid bid) throws Exception{
-		if(getUtil(bid)<= utilitySpace.getReservationValue()){
+		if(getUtil(bid)<= utilitySpace.getReservationValue() || this.detectAbuse() ){
 			return true;
 		}else{		
 			return false;
@@ -268,7 +269,28 @@ public class LexicographicAgent extends Agent {
 			allBidsList.add(iterator.next());
 		}
 	}
-
+	
+	private boolean detectAbuse(){
+		//pessimistic
+		if ((100 - this.getUtility(actualBid)) <= this.getUtility(lastPartnerBid)){
+			return false;
+		}
+		//optimistic
+//		if (100 - this.getUtility(lastBid) <= this.getUtility(lastPartnerBid)){
+//			return true;
+//		}
+		return true;
+		//double currentMiddlePointOptimistic = (this.getUtility(actualBid)+this.getUtility(lastPartnerBid))/2;
+	}
+	
+	private void calculateFairDistribution(){
+		double initialUtility = this.getUtility(listOfAllBids.get(0));
+		double intialUtilityOpponent = this.getUtility(lastPartnerBid);
+		middlePointUtility = (initialUtility + intialUtilityOpponent ) / 2 ;
+	}
+	
+	
+	
 }
 
 
